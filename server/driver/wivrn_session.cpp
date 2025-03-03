@@ -381,9 +381,12 @@ void wivrn_session::operator()(from_headset::trackings && tracking)
 		        std::string(magic_enum::enum_name(roles.right_profile)).c_str(),
 		        std::string(magic_enum::enum_name(right)).c_str());
 		std::lock_guard lock(roles_mutex);
-		roles.left_profile = left;
-		roles.right_profile = right;
-		++roles.generation_id;
+		if (left != XRT_DEVICE_INVALID)
+			roles.left_profile = left;
+		if (right != XRT_DEVICE_INVALID)
+			roles.right_profile = right;
+		if (left != XRT_DEVICE_INVALID or right != XRT_DEVICE_INVALID)
+			++roles.generation_id;
 	}
 
 	for (auto & item: tracking.items)
