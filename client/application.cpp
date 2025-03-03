@@ -69,6 +69,8 @@ struct interaction_profile
 };
 
 static std::vector<interaction_profile> interaction_profiles{
+// simple controller is mostly useless, keep it on PC for Monado simulated driver
+#ifndef __ANDROID__
         interaction_profile{
                 "/interaction_profiles/khr/simple_controller",
                 {},
@@ -89,6 +91,7 @@ static std::vector<interaction_profile> interaction_profiles{
                         "/user/hand/right/input/select/click",
 
                 }},
+#endif
         interaction_profile{
                 "/interaction_profiles/oculus/touch_controller",
                 {},
