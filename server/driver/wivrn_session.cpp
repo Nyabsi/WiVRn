@@ -322,7 +322,7 @@ static xrt_device_name get_name(interaction_profile profile)
 	switch (profile)
 	{
 		case interaction_profile::none:
-			return XRT_DEVICE_INVALID;
+			return XRT_DEVICE_DISABLED;
 		case interaction_profile::khr_simple_controller:
 			return XRT_DEVICE_SIMPLE_CONTROLLER;
 		case interaction_profile::bytedance_pico_neo3_controller:

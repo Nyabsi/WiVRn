@@ -1,0 +1,69 @@
+From 8ab16b958acc8e5506f0da04375fa1f4ed4f996d Mon Sep 17 00:00:00 2001
+From: Patrick Nicolas <patricknicolas@laposte.net>
+Date: Mon, 3 Mar 2025 17:25:08 +0100
+Subject: [PATCH] st/oxr: allow unbinding of interaction profiles
+
+---
+ src/xrt/include/xrt/xrt_defines.h        | 1 +
+ src/xrt/state_trackers/oxr/oxr_binding.c | 4 ++++
+ src/xrt/state_trackers/oxr/oxr_input.c   | 4 ++--
+ 3 files changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/src/xrt/include/xrt/xrt_defines.h b/src/xrt/include/xrt/xrt_defines.h
+index 8873330a2..ae28a37ca 100644
+--- a/src/xrt/include/xrt/xrt_defines.h
++++ b/src/xrt/include/xrt/xrt_defines.h
+@@ -710,6 +710,7 @@ struct xrt_relation_chain
+  */
+ enum xrt_device_name
+ {
++	XRT_DEVICE_DISABLED = -1,
+ 	XRT_DEVICE_INVALID = 0,
+ 
+ 	XRT_DEVICE_GENERIC_HMD = 1,
+diff --git a/src/xrt/state_trackers/oxr/oxr_binding.c b/src/xrt/state_trackers/oxr/oxr_binding.c
+index b04977a8b..7f50ff1dc 100644
+--- a/src/xrt/state_trackers/oxr/oxr_binding.c
++++ b/src/xrt/state_trackers/oxr/oxr_binding.c
+@@ -386,6 +386,10 @@ oxr_find_profile_for_device(struct oxr_logger *log,
+ 		struct xrt_device *role_xdev = GET_XDEV_BY_ROLE(sess->sys, X);                                         \
+ 		if (role_xdev == xdev) {                                                                               \
+ 			enum xrt_device_name profile = GET_PROFILE_NAME_BY_ROLE(sess->sys, X);                         \
++			if (profile == XRT_DEVICE_DISABLED) {                                                          \
++				*out_p = NULL;                                                                         \
++				return;                                                                                \
++			}                                                                                              \
+ 			oxr_get_profile_for_device_name(log, sess, profile, out_p);                                    \
+ 			if (*out_p != NULL) {                                                                          \
+ 				return;                                                                                \
+diff --git a/src/xrt/state_trackers/oxr/oxr_input.c b/src/xrt/state_trackers/oxr/oxr_input.c
+index bf69e79ac..2bf722b02 100644
+--- a/src/xrt/state_trackers/oxr/oxr_input.c
++++ b/src/xrt/state_trackers/oxr/oxr_input.c
+@@ -1782,10 +1782,10 @@ oxr_session_attach_action_sets(struct oxr_logger *log,
+ 	sess->X = XR_NULL_PATH;                                                                                        \
+ 	if (profiles.X != NULL) {                                                                                      \
+ 		sess->X = profiles.X->path;                                                                            \
+-		oxr_event_push_XrEventDataInteractionProfileChanged(log, sess);                                        \
+ 	}
+ 	OXR_FOR_EACH_VALID_SUBACTION_PATH(POPULATE_PROFILE)
+ #undef POPULATE_PROFILE
++	oxr_event_push_XrEventDataInteractionProfileChanged(log, sess);
+ 	return oxr_session_success_result(sess);
+ }
+ 
+@@ -1807,10 +1807,10 @@ oxr_session_update_action_bindings(struct oxr_logger *log, struct oxr_session *s
+ 	sess->X = XR_NULL_PATH;                                                                                        \
+ 	if (profiles.X != NULL) {                                                                                      \
+ 		sess->X = profiles.X->path;                                                                            \
+-		oxr_event_push_XrEventDataInteractionProfileChanged(log, sess);                                        \
+ 	}
+ 	OXR_FOR_EACH_VALID_SUBACTION_PATH(POPULATE_PROFILE)
+ #undef POPULATE_PROFILE
++	oxr_event_push_XrEventDataInteractionProfileChanged(log, sess);
+ 
+ 	return oxr_session_success_result(sess);
+ }
+-- 
+2.48.1
+
