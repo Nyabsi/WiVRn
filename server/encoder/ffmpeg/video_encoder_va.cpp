@@ -129,6 +129,11 @@ vk::Format drm_to_vulkan_fmt(uint32_t drm_fourcc)
 	return vulkan_drm_format_map.at(drm_fourcc);
 }
 
+static bool is_amd(const vk::raii::PhysicalDevice & physical_device)
+{
+	return physical_device.getProperties().vendorID == 0x1002;
+}
+
 } // namespace
 
 video_encoder_va::video_encoder_va(wivrn_vk_bundle & vk,
@@ -225,6 +230,17 @@ video_encoder_va::video_encoder_va(wivrn_vk_bundle & vk,
 	encoder_ctx->bit_rate = settings.bitrate;
 	encoder_ctx->gop_size = std::numeric_limits<decltype(encoder_ctx->gop_size)>::max();
 	encoder_ctx->hw_frames_ctx = av_buffer_ref(vaapi_frame_ctx.get());
+
+	if (is_amd(vk.physical_device) and not settings.device)
+	{
+		// Variance Based Adaptive Quantization
+		// should improve quality on smooth parts
+		static const int vbaq = 16;
+		// pre encode filter
+		// Is supposed to improve coding efficiency
+		static const int pre_encode = 8;
+		encoder_ctx->compression_level = vbaq | pre_encode;
+	}
 
 	err = avcodec_open2(encoder_ctx.get(), codec, &opts);
 	av_dict_free(&opts);
