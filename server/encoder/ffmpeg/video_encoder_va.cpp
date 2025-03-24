@@ -239,7 +239,7 @@ video_encoder_va::video_encoder_va(wivrn_vk_bundle & vk,
 		// pre encode filter
 		// Is supposed to improve coding efficiency
 		static const int pre_encode = 8;
-		encoder_ctx->compression_level = vbaq | pre_encode;
+		encoder_ctx->compression_level = pre_encode;
 	}
 
 	err = avcodec_open2(encoder_ctx.get(), codec, &opts);
