@@ -836,6 +836,11 @@ void wivrn_controller::update_hand_tracking(const from_headset::hand_tracking & 
 		cnx->set_enabled(joints.hand_id == 0 ? to_headset::tracking_control::id::left_hand : to_headset::tracking_control::id::right_hand, false);
 }
 
+void wivrn_controller::clear_hand_tracking()
+{
+	joints.reset();
+}
+
 void wivrn_controller::set_output(xrt_output_name name, const xrt_output_value * value)
 {
 	device_id id;

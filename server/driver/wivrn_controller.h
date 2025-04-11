@@ -62,5 +62,6 @@ public:
 	void set_derived_pose(const from_headset::derived_pose &);
 	void update_tracking(const from_headset::tracking &, const clock_offset &);
 	void update_hand_tracking(const from_headset::hand_tracking &, const clock_offset &);
+	void clear_hand_tracking();
 };
 } // namespace wivrn

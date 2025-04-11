@@ -293,6 +293,8 @@ struct trackings
 	// /user/hand/left and /user/hand/right
 	std::array<interaction_profile, 2> interaction_profiles;
 	std::vector<tracking> items;
+	// Flag to notify that hands are no longer tracked (left/right)
+	std::array<bool, 2> clear_hands;
 };
 
 struct derived_pose

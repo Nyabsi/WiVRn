@@ -131,5 +131,12 @@ public:
 
 		return {};
 	}
+
+	void reset()
+	{
+		std::lock_guard lock(mutex);
+		for (auto & item: data)
+			item.at_timestamp_ns = 0;
+	}
 };
 } // namespace wivrn

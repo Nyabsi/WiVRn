@@ -384,6 +384,11 @@ void wivrn_session::operator()(from_headset::trackings && tracking)
 		++roles.generation_id;
 	}
 
+	if (tracking.clear_hands[0])
+		left_hand.clear_hand_tracking();
+	if (tracking.clear_hands[1])
+		right_hand.clear_hand_tracking();
+
 	for (auto & item: tracking.items)
 		(*this)(item);
 }

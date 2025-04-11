@@ -390,6 +390,7 @@ void scenes::stream::tracking()
 					        interaction_profiles[0].load(),
 					        interaction_profiles[1].load(),
 					};
+					merged_tracking.back().clear_hands = {false, false};
 					current_size = 0;
 				}
 				current_size += size;
@@ -398,12 +399,6 @@ void scenes::stream::tracking()
 
 			packets.resize(std::max(packets.size(), merged_tracking.size() + hands.size()));
 			size_t packet_count = 0;
-			for (const auto & i: merged_tracking)
-			{
-				auto & packet = packets[packet_count++];
-				packet.clear();
-				wivrn_session::stream_socket_t::serialize(packet, i);
-			}
 			for (const auto & i: hands)
 			{
 				if (i.joints)
@@ -412,6 +407,17 @@ void scenes::stream::tracking()
 					packet.clear();
 					wivrn_session::stream_socket_t::serialize(packet, i);
 				}
+				else
+				{
+					for (auto & packet: merged_tracking)
+						packet.clear_hands[i.hand] = true;
+				}
+			}
+			for (const auto & i: merged_tracking)
+			{
+				auto & packet = packets[packet_count++];
+				packet.clear();
+				wivrn_session::stream_socket_t::serialize(packet, i);
 			}
 
 			network_session->send_stream(std::span(packets.data(), packet_count));
