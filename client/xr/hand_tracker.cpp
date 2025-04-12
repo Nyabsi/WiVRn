@@ -25,6 +25,8 @@
 #include <cassert>
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
+#include <magic_enum.hpp>
+#include <spdlog/spdlog.h>
 
 static PFN_xrDestroyHandTrackerEXT xrDestroyHandTrackerEXT{};
 
@@ -73,6 +75,24 @@ std::optional<std::array<xr::hand_tracker::joint, XR_HAND_JOINT_COUNT_EXT>> xr::
 	};
 
 	CHECK_XR(xrLocateHandJointsEXT(id, &info, &locations));
+
+	std::string log;
+	for (int i = 0; i < XR_HAND_JOINT_COUNT_EXT; i++)
+	{
+		std::string_view short_name(magic_enum::enum_name(XrHandJointEXT(i)));
+		short_name = short_name.substr(strlen("XR_HAND_JOINT_"));
+		short_name = short_name.substr(0, short_name.size() - strlen("_EXT"));
+		log += fmt::format("\n\t{:19}: {}",
+		                   short_name,
+		                   int(joints_pos[i].locationFlags));
+	}
+	spdlog::info(
+	        "Hand tracking for {}:\n"
+	        "\tisActive: {}"
+	        "{}",
+	        magic_enum::enum_name(hand_id),
+	        locations.isActive,
+	        log);
 
 	if (!locations.isActive)
 		return std::nullopt;
