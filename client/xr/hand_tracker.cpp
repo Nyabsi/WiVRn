@@ -77,6 +77,13 @@ std::optional<std::array<xr::hand_tracker::joint, XR_HAND_JOINT_COUNT_EXT>> xr::
 	if (!locations.isActive)
 		return std::nullopt;
 
+	// Meta doesn't follow spec and can return isActive true, but invalid positions
+	for (const auto & joint: joints_pos)
+	{
+		if (not(joint.locationFlags & XR_SPACE_LOCATION_POSITION_VALID_BIT && joint.locationFlags & XR_SPACE_LOCATION_ORIENTATION_VALID_BIT))
+			return std::nullopt;
+	}
+
 	float offset_angle = 0;
 
 	// check if we have a device that needs a thumb offset
@@ -123,11 +130,4 @@ std::optional<std::array<xr::hand_tracker::joint, XR_HAND_JOINT_COUNT_EXT>> xr::
 	}
 
 	return joints;
-}
-
-bool xr::hand_tracker::check_flags(const std::array<joint, XR_HAND_JOINT_COUNT_EXT> & joints, XrSpaceLocationFlags position, XrSpaceVelocityFlags velocity)
-{
-	return std::ranges::all_of(joints, [position, velocity](const auto & joint) {
-		return (joint.first.locationFlags & position) == position and (joint.second.velocityFlags & velocity) == velocity;
-	});
 }
